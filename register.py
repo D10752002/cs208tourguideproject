@@ -10,13 +10,17 @@ def signup():
         client = pymongo.MongoClient(conn_str, serverSelectionTimeoutMS=5000,  tlsCAFile=certifi.where())
         db = client['Tour']
         collection = db['Customers']
-        obj = {
-            "email" : email,
-            "password": password,
-            "set": 0
-        }
-        collection.insert_one(obj)
-        return render_template("login.html")
+        found = collection.find_one({"email" : email})
+        if found is None:
+            obj = {
+                "email" : email,
+                "password": password,
+                "set": 0
+            }
+            collection.insert_one(obj)
+            return render_template("login.html")
+        else:
+            return "User Already Exists! Kindly login."
     return redirect(url_for("login"))
 
 def register():
